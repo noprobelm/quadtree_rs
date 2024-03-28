@@ -69,6 +69,39 @@ pub struct QuadTree {
 
 #[wasm_bindgen]
 impl QuadTree {
+    fn subdivide(&mut self) {
+        let half_width = self.boundary.width / 2;
+        let half_height = self.boundary.height / 2;
+        let quarter_width = half_width / 2;
+        let quarter_height = half_height / 2;
+
+        let ne = Rectangle {
+            center: Point { x: self.boundary.center.x + quarter_width, y: self.boundary.center.y - quarter_height },
+            width: half_width,
+            height: half_height,
+        };
+        let nw = Rectangle {
+            center: Point { x: self.boundary.center.x - quarter_width, y: self.boundary.center.y - quarter_height },
+            width: half_width,
+            height: half_height,
+        };
+        let se = Rectangle {
+            center: Point { x: self.boundary.center.x + quarter_width, y: self.boundary.center.y + quarter_height },
+            width: half_width,
+            height: half_height,
+        };
+        let sw = Rectangle {
+            center: Point { x: self.boundary.center.x - quarter_width, y: self.boundary.center.y + quarter_height },
+            width: half_width,
+            height: half_height,
+        };
+
+        self.northeast = Some(Box::new(QuadTree::new(ne, self.capacity)));
+        self.northwest = Some(Box::new(QuadTree::new(nw, self.capacity)));
+        self.southeast = Some(Box::new(QuadTree::new(se, self.capacity)));
+        self.southwest = Some(Box::new(QuadTree::new(sw, self.capacity)));
+    }
+
     fn query(&self, range: &Rectangle, found_points: &mut Vec<Point>) {
         if !self.boundary.intersects(range) {
             return;
@@ -150,19 +183,19 @@ impl QuadTree {
 
         // Otherwise, recurse into the children
         if let Some(northeast) = &self.northeast {
-            northeast.query(range, found_points);
+            northeast.query_all(range, found_points, found_rects);
         }
 
         if let Some(northwest) = &self.northwest {
-            northwest.query(range, found_points);
+            northwest.query_all(range, found_points, found_rects);
         }
 
         if let Some(southeast) = &self.southeast {
-            southeast.query(range, found_points);
+            southeast.query_all(range, found_points, found_rects);
         }
 
         if let Some(southwest) = &self.southwest {
-            southwest.query(range, found_points);
+            southwest.query_all(range, found_points, found_rects);
         }
     }}
 
@@ -180,6 +213,7 @@ impl QuadTree {
             southwest: None,
         }
    }
+
     pub fn insert(&mut self, point: Point) -> bool {
             if !self.boundary.contains(&point) {
                 return false;
@@ -201,39 +235,7 @@ impl QuadTree {
             }
         }
 
-    pub fn subdivide(&mut self) {
-        let half_width = self.boundary.width / 2;
-        let half_height = self.boundary.height / 2;
-        let quarter_width = half_width / 2;
-        let quarter_height = half_height / 2;
 
-        let ne = Rectangle {
-            center: Point { x: self.boundary.center.x + quarter_width, y: self.boundary.center.y - quarter_height },
-            width: half_width,
-            height: half_height,
-        };
-        let nw = Rectangle {
-            center: Point { x: self.boundary.center.x - quarter_width, y: self.boundary.center.y - quarter_height },
-            width: half_width,
-            height: half_height,
-        };
-        let se = Rectangle {
-            center: Point { x: self.boundary.center.x + quarter_width, y: self.boundary.center.y + quarter_height },
-            width: half_width,
-            height: half_height,
-        };
-        let sw = Rectangle {
-            center: Point { x: self.boundary.center.x - quarter_width, y: self.boundary.center.y + quarter_height },
-            width: half_width,
-            height: half_height,
-        };
-
-        self.northeast = Some(Box::new(QuadTree::new(ne, self.capacity)));
-        self.northwest = Some(Box::new(QuadTree::new(nw, self.capacity)));
-        self.southeast = Some(Box::new(QuadTree::new(se, self.capacity)));
-        self.southwest = Some(Box::new(QuadTree::new(sw, self.capacity)));
-
-    }
 
     pub fn query_for_js(&self, range: &Rectangle) -> String {
         let mut found_points: Vec<Point> = Vec::new();
