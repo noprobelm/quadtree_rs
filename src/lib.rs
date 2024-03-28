@@ -1,7 +1,6 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
-
 use serde::{Serialize, Deserialize};
 
 #[wasm_bindgen]
@@ -136,7 +135,7 @@ impl QuadTree {
         if let Some(southwest) = &self.southwest {
             southwest.query(range, found_points);
         }
-        
+
     }
 
     fn query_rects(&self, found_rects: &mut Vec<Rectangle>) {
@@ -163,7 +162,7 @@ impl QuadTree {
         if let Some(southwest) = &self.southwest {
             southwest.query_rects(found_rects);
         }
-        
+
     }
 }
 
