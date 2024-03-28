@@ -69,7 +69,6 @@ pub struct QuadTree {
 
 #[wasm_bindgen]
 impl QuadTree {
-
     fn query(&self, range: &Rectangle, found_points: &mut Vec<Point>) {
         if !self.boundary.intersects(range) {
             return;
