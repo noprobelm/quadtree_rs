@@ -101,7 +101,6 @@ impl QuadTree {
         if let Some(southwest) = &self.southwest {
             southwest.query(range, found_points);
         }
-
     }
 
     fn query_rects(&self, found_rects: &mut Vec<Rectangle>) {
@@ -130,7 +129,42 @@ impl QuadTree {
         }
 
     }
-}
+
+    fn query_all(&self, range: &Rectangle, found_points: &mut Vec<Point>, found_rects: &mut Vec<Rectangle>) {
+        found_rects.push(self.boundary);
+
+        if !self.boundary.intersects(range) {
+            return;
+        }
+
+        for point in &self.points {
+            if range.contains(point) {
+                found_points.push(*point);
+            }
+        }
+
+        // If this quad can't be divided further, then return
+        if !self.divided {
+            return;
+        }
+
+        // Otherwise, recurse into the children
+        if let Some(northeast) = &self.northeast {
+            northeast.query(range, found_points);
+        }
+
+        if let Some(northwest) = &self.northwest {
+            northwest.query(range, found_points);
+        }
+
+        if let Some(southeast) = &self.southeast {
+            southeast.query(range, found_points);
+        }
+
+        if let Some(southwest) = &self.southwest {
+            southwest.query(range, found_points);
+        }
+    }}
 
 #[wasm_bindgen]
 impl QuadTree {
