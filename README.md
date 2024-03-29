@@ -1,5 +1,5 @@
 # Interactive QuadTree
-An interactive visualization of a Quadtree, implemented using Rust/WebAssembly and rendered in Javascript.
+An interactive visualization of a quadtree implemented in Rust/WebAssembly
 
 ![Interactive Quad Tree Demo](demo.png)
 
