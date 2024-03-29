@@ -1,5 +1,5 @@
 [package]
-name = "quadtree"
+name = "quadtree-rs"
 version = "0.1.0"
 authors = ["noprobelm <noprobelm@protonmail.com>"]
 edition = "2018"
