@@ -55,6 +55,12 @@ impl Rectangle {
     }
 }
 
+#[derive(Serialize)]
+pub struct QuadTreeData {
+    points: Vec<Point>,
+    rects: Vec<Rectangle>
+}
+
 #[wasm_bindgen]
 pub struct QuadTree {
     boundary: Rectangle,
@@ -201,7 +207,7 @@ impl QuadTree {
 
 #[wasm_bindgen]
 impl QuadTree {
-   pub fn new(boundary: Rectangle, capacity: usize) -> Self {
+    pub fn new(boundary: Rectangle, capacity: usize) -> Self {
         QuadTree {
             boundary,
             capacity,
@@ -235,8 +241,6 @@ impl QuadTree {
             }
         }
 
-
-
     pub fn query_for_js(&self, range: &Rectangle) -> String {
         let mut found_points: Vec<Point> = Vec::new();
         self.query(range, &mut found_points);
@@ -247,5 +251,13 @@ impl QuadTree {
         let mut found_rects: Vec<Rectangle> = Vec::new();
         self.query_rects(&mut found_rects);
         serde_json::to_string(&found_rects).unwrap_or_else(|_| "[]".to_string())
+    }
+
+    pub fn query_all_for_js(&self, range: &Rectangle) -> String {
+        let mut found_points: Vec<Point> = Vec::new();
+        let mut found_rects: Vec<Rectangle> = Vec::new();
+        self.query_all(range, &mut found_points, &mut found_rects);
+        let qtree_data = QuadTreeData {points: found_points, rects: found_rects};
+        serde_json::to_string(&qtree_data).unwrap_or_else(|_| "[]".to_string())
     }
 }
